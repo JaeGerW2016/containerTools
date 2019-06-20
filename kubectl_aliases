@@ -1,0 +1,84 @@
+#!/bin/bash
+
+kt-exec() {
+	if [ $# -eq 3 ];then
+		kubectl exec -it -n $1 $2 -c $3 -- sh
+	elif [ $# -eq 2 ];then
+		kubectl exec -it -n $1 $2 -- sh
+	elif [ $# -eq 1 ];then
+		kubectl exec -it $1 -- sh
+	else
+		echo "Usage: kubectl exec -n NAMESPACE POD [-c CONTAINER] [-i] [-t] [flags] [-- COMMAND [args...]]"
+	fi
+}
+
+kt-describe-node() {
+	kubectl describle node $1
+}
+
+kt-get-ready-node() {
+	kubectl get node -o wide | grep -vE "NAME|NotReady"
+}
+
+kt-get-notready-node() {
+	kubectl get node -o wide | grep -E "NAME|NotReady"
+}
+
+kt-get-node-all() {
+	kubectl get node -o wide
+}
+
+kt-describle-pod() {
+	if [ $# -eq 2 ]; then
+		kubectl describe pod -n $1 $2
+	else
+		kubectl describe pod $1
+	fi
+}
+
+kt-describe-pod-all() {
+	kubectl get pod --all-namespaces -o wide
+}
+
+kt-get-pod-by-ns() {
+	kubectl get pod -n $1 -o wide
+}
+
+kt-get-pod-by-rs() {
+	if [ $# -eq 2 ];then
+		labels=`kubectl get rs -n $1 -o go-template --template="{{ range \\$key, \\$value := .Spec.selector.matchLabels}},{{\\$key}}={{\\$value}}{{end}}" $2`
+		labels=`echo ${labels/,/}`
+		kubectl get pod -n $1 -l $labels -o wide 
+	else
+		labels=`kubectl get rs -o go-template --template="{{ range \\$key, \\$value := .Spec.selector.matchLabels}},{{\\$key}}={{\\$value}}{{end}}" $1`
+		labels=`echo ${labels/,/}`
+		kubectl get pod -l $labels -o wide
+	fi
+}
+
+kt-get-pod-by-svc() {
+        if [ $# -eq 2 ];then
+                labels=`kubectl get svc -n $1 -o go-template --template="{{ range \\$key,\\$value := .Spec.selector}},{{\\$key}}={{\\$value}}{{end}}" $2`
+                labels=`echo ${labels/,/}`
+                kubectl get pod -n $1 -l $labels -o wide
+        else
+                labels=`kubectl get svc -o go-template --template="{{ range \\$key,\\$value := .Spec.selector}},{{\\$key}}={{\\$value}}{{end}}" $1`
+                labels=`echo ${labels/,/}`
+                kubectl get pod -l $labels -o wide
+        fi
+}
+
+t-get-pod-by-deploy()
+{
+	if [[ $# == 2 ]]
+	then
+		labels=`kubectl get deployment -n $1 -o go-template --template="{{ range \\$key, \\$value := .spec.selector.matchLabels}},{{\\$key}}={{\\$value}}{{end}}" $2`
+		labels=`echo ${labels/,/}`
+		kubectl get pod -l $labels -o wide -n $1
+	else
+		labels=`kubectl get deployment -o go-template --template="{{ range \\$key, \\$value := .spec.selector.matchLabels}},{{\\$key}}={{\\$value}}{{end}}" $1`
+		labels=`echo ${labels/,/}`
+		kubectl get pod -l $labels -o wide
+	fi
+}
+	

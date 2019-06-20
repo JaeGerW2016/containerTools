@@ -1,0 +1,72 @@
+#!/bin/bash
+
+alias dk='docker'
+alias dki='docker images'
+alias dks='docker service'
+alias dkrm='docker rm'
+alias dkl='docker logs'
+alias dklf='docker logs -f'
+alias dkflush='docker rm `docker ps --no-trunc -aq`'
+alias dkflush2='docker rmi `docker images --filter "dangling=true" -q --no-trunc`'
+alias dkps="docker ps --format '{{.ID}} ~ {{.Names}} ~ {{.Status}} ~ {{.Image}}'"
+alias dkt='docker stats --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}"'
+
+
+dke() {
+	docker exec -it $1 sh
+}
+
+dkexec() {
+	docker exec -it $1 $2	
+}
+
+dk-show-pid() {
+	docker inspect -f '{{.State.Pid}}' $1
+}
+
+dkln() {
+	docker logs -f `docker ps | grep $1 | awk '{print $1}'`
+}
+
+dkclean() {
+	docker rm $(docker ps --all -q -f state=exited)
+	docker volume rm $(docker volume ls -qf dangling=true)
+}
+
+dkprune() {
+	docker system prune -af
+}
+
+dktop() {
+	docker stats --format "table {{.Container}}\t{{.Name}}\t{{.CPUPerc}} {{.MemPerc}}\t{{.NetIO}}\t{{.BlockIO}}"
+}
+
+dkstats() {
+	if [ $# -eq 0 ];then
+	  docker stats --no-stream;
+	else
+	  docker stats --no-stream | grep $1;
+	fi
+}
+
+dkstate() {
+	docker inspect $1 | jq .[0].State
+}
+
+dksb() {
+	docker service scale $1=0
+	sleep 2
+	docker service scale $1=$2
+}
+
+dk-show-volume() {
+	docker inspect -f '{{range .Mounts}}{{printf "%s\n" .Source}}{{end}}' $1
+}
+
+dk-show-volume-all() {
+	docker inspect -f '{{range .Mounts}}{{printf "%s:%n\n" .Source .Destination}}{{end}}' $1
+}
+
+dk-show-pid-all() {
+	docker top $1
+}
