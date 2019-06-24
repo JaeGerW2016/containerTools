@@ -7,12 +7,8 @@ if [ $row_nu -eq 2 ];then
 	echo "container alias exist"
 else	
 cat >> ~/.bashrc <<EOF
-if [ -f ~/.alias/docker_aliases ]; then
-	source ~/.alias/docker_aliases
-fi
-if [ -f ~/.alias/kubectl_aliases ]; then
- 	source ~/.alias/kubectl_aliases
-fi
+[ -f ~/.alias/docker_aliases ] && source ~/.alias/docker_aliases
+[ -f ~/.alias/kubectl_aliases ] && source ~/.alias/kubectl_aliases
 EOF
 fi
 source ~/.bashrc
