@@ -74,32 +74,3 @@ if __name__ == "__main__":
 
     print("-- pull {image} done --".format(image=image))
     sys.exit(0)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
