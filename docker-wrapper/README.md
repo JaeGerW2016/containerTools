@@ -12,6 +12,6 @@ cp containerTools/docker-wrapper/docker-wrapper /usr/local/bin/
 ### Usage
 
 ```
-docker-wrapper pull gcr.io/googlecontainers/kube-apiserver:1.15.0
+docker-wrapper pull gcr.io/google_containers/kube-apiserver:1.15.0
 
 ```
